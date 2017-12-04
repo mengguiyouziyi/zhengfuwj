@@ -14,7 +14,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'accept-language': "zh-CN,zh;q=0.9",
 			'cache-control': "no-cache",
 			'connection': "keep-alive",
-			'cookie': "UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512105327",
+			# 'cookie': "UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512105327",
 			'host': "gk.tj.gov.cn",
 			'upgrade-insecure-requests': "1",
 			# 'user-agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
