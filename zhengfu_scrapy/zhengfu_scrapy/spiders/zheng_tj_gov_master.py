@@ -173,7 +173,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'postman-token': "231f3a6a-e424-1bfe-da69-88aa669c9dbf"
 		}
 		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla},
-		                     callback=self.parse_next)
+		                     callback=self.parse_next, headers=headers)
 		print(payload)
 
 	# def parse_next(self, response):
