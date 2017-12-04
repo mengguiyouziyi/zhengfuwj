@@ -120,39 +120,62 @@ class TouzishijianSpider(scrapy.Spider):
 		select = Selector(text=response.text)
 		li_tags = select.xpath('//div[@class="index_right_content"]/ul/li')
 		for li in li_tags:
-			# a = li.xpath('./a')
-			# title = a.xpath('./@title').extract_first()
 			detail_url = li.xpath('./a/@href').extract_first()
-			# index_num = li.xpath('./span[@class="date1"]/text()').extract_first().replace('索引号：', '')
-			# out_date = li.xpath('./span[@class="date3"]/text()').extract_first().replace('发文日期：', '')
-			# art_num = li.xpath('./span[@class="date2"]/text()').extract_first().replace('文号：', '')
-			# yield scrapy.Request(url=detail_url, callback=self.parse_detail,
-			#                      meta={'f_cla': f_cla, 't_cla': t_cla, 'title': title, 'index_num': index_num,
-			#                            'out_date': out_date, 'art_num': art_num}, dont_filter=True)
 			val = f_cla + '~' + t_cla + '~' + detail_url
 			self.rc.sadd('zheng_tj_url', val)
 			print(val)
 		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
 		p_num = math.ceil(int(arts) / 10)
-		# p_num = select.xpath('//span[@class="nav_pagenum"]/text()').extract_first()
 		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
 		if int(p_num) < 2:
 			return
+		payload = 'SType=1&searchColumn=&searchYear=&preSWord=&sword=&searchAgain=&page=%(page)s&pubURL=&ztfl=%(num)s' % {
+			'page': 2,
+			'num': num
+		}
+		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
+		yield scrapy.Request(n_url, method='POST', callback=self.parse_next, meta={'f_cla': f_cla, 't_cla': t_cla})
+
+	def parse_next(self, response):
+		print(response.url)
+		f_cla = response.meta.get('f_cla')
+		t_cla = response.meta.get('t_cla')
+		num = response.meta.get('num')
+		select = Selector(text=response.text)
+		li_tags = select.xpath('//div[@class="index_right_content"]/ul/li')
+		for li in li_tags:
+			detail_url = li.xpath('./a/@href').extract_first()
+			val = f_cla + '~' + t_cla + '~' + detail_url
+			self.rc.sadd('zheng_tj_url', val)
+			print(val)
+		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
+		p_num = math.ceil(int(arts) / 10)
+		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
 		body = response.request.body.decode('utf-8')
-		if not body:
-			body = 'SType=1&searchColumn=&searchYear=&preSWord=&sword=&searchAgain=&page=%(page)s&pubURL=&ztfl=%(num)s' % {
-				'page': 1,
-				'num': num
-			}
 		now_page = re.search(r'page=(\d+)&', body).group(1)
 		now_page = int(now_page)
 		if now_page >= p_num:
 			return
 		payload = re.sub(r'page=\d+&', 'page=' + str(now_page + 1) + '&', body)
-		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla})
+		headers = {
+			'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+			'accept-encoding': "gzip, deflate",
+			'accept-language': "zh-CN,zh;q=0.9,en;q=0.8",
+			'cache-control': "no-cache",
+			'connection': "keep-alive",
+			'content-length': "87",
+			'content-type': "application/x-www-form-urlencoded",
+			# 'cookie': "JSESSIONID=4EBE67DEB69706501CEDBD19D45CDEF2; UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512374430",
+			'host': "gk.tj.gov.cn",
+			'origin': "http://gk.tj.gov.cn",
+			'referer': "http://gk.tj.gov.cn/govsearch/search.jsp?ztfl=246",
+			'upgrade-insecure-requests': "1",
+			# 'user-agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
+			'postman-token': "231f3a6a-e424-1bfe-da69-88aa669c9dbf"
+		}
+		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla},
+		                     callback=self.parse_next, headers=headers)
 		print(payload)
-
-	# print(payload)
 
 	# def parse_next(self, response):
 	# 	# print(response.request.body.decode('utf-8'))
