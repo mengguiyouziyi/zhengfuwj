@@ -113,6 +113,7 @@ class TouzishijianSpider(scrapy.Spider):
 			yield scrapy.Request(url, meta={'f_cla': f_cla, 't_cla': t_cla, 'num': num})
 
 	def parse(self, response):
+		print(response.url)
 		f_cla = response.meta.get('f_cla')
 		t_cla = response.meta.get('t_cla')
 		num = response.meta.get('num')
