@@ -35,14 +35,15 @@ class TouzishijianSpider(scrapy.Spider):
 
 	def start_requests(self):
 		while True:
-			comp = self.rc.rpop('zheng_tj_url')
+			comp = self.rc.spop('zheng_tj_url')
 			if not comp:
 				raise CloseSpider('no datas')
 			v_l = comp.split('~')
 			f_cla = v_l[0]
 			t_cla = v_l[1]
 			detail_url = v_l[2]
-			yield scrapy.Request(detail_url, meta={'f_cla': f_cla, 't_cla': t_cla}, dont_filter=False)
+			yield scrapy.Request(detail_url, meta={'f_cla': f_cla, 't_cla': t_cla})
+			print(detail_url)
 
 	def parse(self, response):
 		f_cla = response.meta.get('f_cla')

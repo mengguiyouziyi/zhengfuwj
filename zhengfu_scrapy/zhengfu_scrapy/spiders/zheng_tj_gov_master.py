@@ -26,7 +26,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'zhengfu_scrapy.middlewares.RetryMiddleware': 110,
 			'zhengfu_scrapy.middlewares.RotateUserAgentMiddleware': 3,
 		},
-		# 'LOG_LEVEL': 'INFO'
+		'LOG_LEVEL': 'INFO'
 	}
 
 	def __init__(self):
@@ -128,7 +128,9 @@ class TouzishijianSpider(scrapy.Spider):
 			# yield scrapy.Request(url=detail_url, callback=self.parse_detail,
 			#                      meta={'f_cla': f_cla, 't_cla': t_cla, 'title': title, 'index_num': index_num,
 			#                            'out_date': out_date, 'art_num': art_num}, dont_filter=True)
-			self.rc.lpush('zheng_tj_url', f_cla + '~' + t_cla + '~' + detail_url)
+			val = f_cla + '~' + t_cla + '~' + detail_url
+			self.rc.sadd('zheng_tj_url', val)
+			print(val)
 		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
 		p_num = math.ceil(int(arts) / 10)
 		# p_num = select.xpath('//span[@class="nav_pagenum"]/text()').extract_first()
@@ -147,6 +149,7 @@ class TouzishijianSpider(scrapy.Spider):
 			return
 		payload = re.sub(r'page=\d+&', 'page=' + str(now_page + 1) + '&', body)
 		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla})
+		print(payload)
 
 	# print(payload)
 
