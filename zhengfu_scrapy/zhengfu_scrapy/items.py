@@ -37,3 +37,13 @@ class TJGovItem(scrapy.Item):
 	subcat = scrapy.Field()
 	summary = scrapy.Field()
 	html = scrapy.Field()
+
+
+class SJZGovItem(scrapy.Item):
+	cat = scrapy.Field()
+	city = scrapy.Field()
+	art_num = scrapy.Field()
+	detail_url = scrapy.Field()
+	title = scrapy.Field()
+	out_date = scrapy.Field()
+	html = scrapy.Field()
