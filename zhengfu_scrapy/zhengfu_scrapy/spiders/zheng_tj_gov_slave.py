@@ -42,7 +42,7 @@ class TouzishijianSpider(scrapy.Spider):
 			f_cla = v_l[0]
 			t_cla = v_l[1]
 			detail_url = v_l[2]
-			yield scrapy.Request(detail_url, meta={'f_cla': f_cla, 't_cla': t_cla})
+			yield scrapy.Request(detail_url, meta={'f_cla': f_cla, 't_cla': t_cla}, dont_filter=False)
 
 	def parse(self, response):
 		f_cla = response.meta.get('f_cla')
@@ -61,11 +61,11 @@ class TouzishijianSpider(scrapy.Spider):
 		item['t_cla'] = t_cla
 		item['title'] = title
 		item['detail_url'] = response.url
-		item['index_num'] = index_num
-		item['out_date'] = out_date
-		item['art_num'] = art_num
-		item['publisher'] = publisher
-		item['subcat'] = subcat
+		item['index_num'] = index_num if index_num else ''
+		item['out_date'] = out_date if out_date else ''
+		item['art_num'] = art_num if art_num else ''
+		item['publisher'] = publisher if publisher else ''
+		item['subcat'] = subcat if subcat else ''
 		item['summary'] = summary if summary else ''
 		item['html'] = html
 		item['city'] = '天津'
