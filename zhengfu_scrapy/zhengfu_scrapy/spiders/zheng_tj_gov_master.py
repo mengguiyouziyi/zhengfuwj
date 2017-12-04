@@ -133,8 +133,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'page': 2,
 			'num': num
 		}
-		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
-		yield scrapy.Request(n_url, method='POST', callback=self.parse_next, meta={'f_cla': f_cla, 't_cla': t_cla})
+		yield scrapy.Request(n_url, method='POST', callback=self.parse_next, meta={'f_cla': f_cla, 't_cla': t_cla}, body=payload)
 
 	def parse_next(self, response):
 		print(response.url)
@@ -174,7 +173,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'postman-token': "231f3a6a-e424-1bfe-da69-88aa669c9dbf"
 		}
 		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla},
-		                     callback=self.parse_next, headers=headers)
+		                     callback=self.parse_next)
 		print(payload)
 
 	# def parse_next(self, response):
