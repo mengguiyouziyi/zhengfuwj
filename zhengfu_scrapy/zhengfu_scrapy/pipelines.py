@@ -12,7 +12,7 @@ from util.info import etl
 class MysqlPipeline(object):
 	def __init__(self, crawler):
 		self.crawler = crawler
-		self.tab = 'zhengfu_bj_gov'
+		self.tab = 'zhengfu_tj_gov'
 		self.conn = etl
 		self.cursor = self.conn.cursor()
 		self.col_list = self._get_column(self.tab)[1:-1]

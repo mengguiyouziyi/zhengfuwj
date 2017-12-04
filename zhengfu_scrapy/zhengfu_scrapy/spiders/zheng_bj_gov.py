@@ -96,11 +96,6 @@ class TouzishijianSpider(scrapy.Spider):
 		yield item
 
 
-# def sol(ext):
-# 	s = ''.join([e.strip() for e in ext if e]) if ext else ''
-# 	return s
-
-
 def re_sub(vl):
 	return re.sub(r'\[.*\]', '', _uniteList(vl), 1)
 
