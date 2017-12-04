@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy, re, math
 from scrapy.selector import Selector
-# from zhengfu_scrapy.items import TJGovItem
 from util.info import startup_nodes
 from rediscluster import StrictRedisCluster
 
@@ -33,8 +32,6 @@ class TouzishijianSpider(scrapy.Spider):
 		self.rc = StrictRedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 
 	def start_requests(self):
-		# url = 'http://gk.tj.gov.cn/index_47.shtml'
-		# yield scrapy.Request(url)
 		f_cla_list = [
 			'机构职能', '市政府文件', '政府规章文件', '规划信息', '统计信息',
 			'政府工作报告', '财政报告', '行政收费', '政府采购', '行政许可',
@@ -101,7 +98,7 @@ class TouzishijianSpider(scrapy.Spider):
 			t_cla_all = t_cla_all + t_cla_list[i]
 		t_cla_len = [len(t) for t in t_cla_list]
 		t_len_sum = [sum(t_cla_len[:i + 1]) for i in range(len(t_cla_len))]
-		burl = 'http://gk.tj.gov.cn/govsearch/search.jsp?ztfl={}'
+		burl = 'http://gk.tj.gov.cn/govsearch/search.jsp?page=1&ztfl={}'
 		for j, num in enumerate(num_all):
 			f_cla = ''
 			for i in range(len(t_cla_len)):
@@ -110,13 +107,11 @@ class TouzishijianSpider(scrapy.Spider):
 					break
 			t_cla = t_cla_all[j]
 			url = burl.format(num)
-			yield scrapy.Request(url, meta={'f_cla': f_cla, 't_cla': t_cla, 'num': num})
+			yield scrapy.Request(url, meta={'f_cla': f_cla, 't_cla': t_cla})
 
 	def parse(self, response):
-		print(response.url)
 		f_cla = response.meta.get('f_cla')
 		t_cla = response.meta.get('t_cla')
-		num = response.meta.get('num')
 		select = Selector(text=response.text)
 		li_tags = select.xpath('//div[@class="index_right_content"]/ul/li')
 		for li in li_tags:
@@ -126,104 +121,11 @@ class TouzishijianSpider(scrapy.Spider):
 			print(val)
 		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
 		p_num = math.ceil(int(arts) / 10)
-		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
 		if int(p_num) < 2:
 			return
-		payload = 'SType=1&searchColumn=&searchYear=&preSWord=&sword=&searchAgain=&page=%(page)s&pubURL=&ztfl=%(num)s' % {
-			'page': 2,
-			'num': num
-		}
-		yield scrapy.Request(n_url, method='POST', callback=self.parse_next, meta={'f_cla': f_cla, 't_cla': t_cla}, body=payload)
-
-	def parse_next(self, response):
-		print(response.url)
-		f_cla = response.meta.get('f_cla')
-		t_cla = response.meta.get('t_cla')
-		num = response.meta.get('num')
-		select = Selector(text=response.text)
-		li_tags = select.xpath('//div[@class="index_right_content"]/ul/li')
-		for li in li_tags:
-			detail_url = li.xpath('./a/@href').extract_first()
-			val = f_cla + '~' + t_cla + '~' + detail_url
-			self.rc.sadd('zheng_tj_url', val)
-			print(val)
-		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
-		p_num = math.ceil(int(arts) / 10)
-		n_url = 'http://gk.tj.gov.cn/govsearch/search.jsp'
-		body = response.request.body.decode('utf-8')
-		now_page = re.search(r'page=(\d+)&', body).group(1)
-		now_page = int(now_page)
-		if now_page >= p_num:
+		url = response.url
+		now_page = re.search(r'page=(\d+)', url).group(1)
+		if int(now_page) >= p_num:
 			return
-		payload = re.sub(r'page=\d+&', 'page=' + str(now_page + 1) + '&', body)
-		headers = {
-			'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-			'accept-encoding': "gzip, deflate",
-			'accept-language': "zh-CN,zh;q=0.9,en;q=0.8",
-			'cache-control': "no-cache",
-			'connection': "keep-alive",
-			'content-length': "87",
-			'content-type': "application/x-www-form-urlencoded",
-			'cookie': "JSESSIONID=4EBE67DEB69706501CEDBD19D45CDEF2; UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512374430",
-			'host': "gk.tj.gov.cn",
-			'origin': "http://gk.tj.gov.cn",
-			'referer': "http://gk.tj.gov.cn/govsearch/search.jsp?ztfl=246",
-			'upgrade-insecure-requests': "1",
-			# 'user-agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
-			'postman-token': "231f3a6a-e424-1bfe-da69-88aa669c9dbf"
-		}
-		yield scrapy.Request(n_url, method='POST', body=payload, meta={'f_cla': f_cla, 't_cla': t_cla},
-		                     callback=self.parse_next, headers=headers)
-		print(payload)
-
-	# def parse_next(self, response):
-	# 	# print(response.request.body.decode('utf-8'))
-	# 	# print('下一页')
-	# 	f_cla = response.meta.get('f_cla')
-	# 	t_cla = response.meta.get('t_cla')
-	# 	select = Selector(text=response.text)
-	# 	li_tags = select.xpath('//div[@class="index_right_content"]/ul/li')
-	# 	for li in li_tags:
-	# 		item = TJGovItem()
-	# 		a = li.xpath('./a')
-	# 		title = a.xpath('./@title').extract_first()
-	# 		detail_url = a.xpath('./@href').extract_first()
-	# 		index_num = li.xpath('./span[@class="date1"]/text()').extract_first().replace('索引号：', '')
-	# 		out_date = li.xpath('./span[@class="date3"]/text()').extract_first().replace('发文日期：', '')
-	# 		art_num = li.xpath('./span[@class="date2"]/text()').extract_first().replace('文号：', '')
-	# 		item['f_cla'] = f_cla
-	# 		item['t_cla'] = t_cla
-	# 		item['title'] = title
-	# 		item['detail_url'] = detail_url
-	# 		item['index_num'] = index_num
-	# 		item['out_date'] = out_date
-	# 		item['art_num'] = art_num
-	# 		yield scrapy.Request(detail_url, callback=self.parse_detail, meta={'item': item})
-	# 		print('发送一个')
-
-	# def parse_detail(self, response):
-	# 	f_cla = response.meta.get('f_cla')
-	# 	t_cla = response.meta.get('t_cla')
-	# 	select = Selector(text=response.text)
-	# 	index_num = select.xpath('//table[@class="table_key"]/tr[1]/td[2]/text()').extract_first()
-	# 	art_num = select.xpath('//table[@class="table_key"]/tr[2]/td[2]/text()').extract_first()
-	# 	out_date = select.xpath('//table[@class="table_key"]/tr[2]/td[4]/text()').extract_first()
-	# 	publisher = select.xpath('//span[@id="span_publisher"]/text()').extract_first()
-	# 	subcat = select.xpath('//span[@id="span_subcat"]/text()').extract_first()
-	# 	title = select.xpath('//span[@id="span_docTitle"]/text()').extract_first()
-	# 	summary = select.xpath('//div[@style="font-size:14px;line-height:25px;"]').extract_first()
-	# 	html = select.xpath('//div[@class="article_content_file"]').extract_first()
-	# 	item = TJGovItem()
-	# 	item['f_cla'] = f_cla
-	# 	item['t_cla'] = t_cla
-	# 	item['title'] = title
-	# 	item['detail_url'] = response.url
-	# 	item['index_num'] = index_num
-	# 	item['out_date'] = out_date
-	# 	item['art_num'] = art_num
-	# 	item['publisher'] = publisher
-	# 	item['subcat'] = subcat
-	# 	item['summary'] = summary if summary else ''
-	# 	item['html'] = html
-	# 	item['city'] = '天津'
-	# 	yield item
+		n_url = re.sub(r'page=\d+', 'page=' + str(int(now_page + 1)), url)
+		yield scrapy.Request(n_url, meta={'f_cla': f_cla, 't_cla': t_cla})

@@ -33,7 +33,7 @@ ROBOTSTXT_OBEY = False
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = True
+# COOKIES_ENABLED = True
 
 # DEBUG INFO WARNING ERROR CRITICAL
 LOG_LEVEL = 'DEBUG'
@@ -102,14 +102,14 @@ USER_AGENT_CHOICES = [
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
+# DOWNLOADER_MIDDLEWARES = {
 	# 'zhengfu_scrapy.middlewares.CloseMiddleware': 111,
 	# 'zhengfu_scrapy.middlewares.ProxyMiddleware': 1,
 	# 'zhengfu_scrapy.middlewares.RetryMiddleware': 110,
-	'zhengfu_scrapy.middlewares.RotateUserAgentMiddleware': 3,
+	# 'zhengfu_scrapy.middlewares.RotateUserAgentMiddleware': 3,
 	# 'zhengfu_scrapy.middlewares.BloomfilterMiddleware': 2,
 	# 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
-}
+# }
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
