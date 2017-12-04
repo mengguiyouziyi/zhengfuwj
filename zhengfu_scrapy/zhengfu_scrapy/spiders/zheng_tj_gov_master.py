@@ -127,5 +127,5 @@ class TouzishijianSpider(scrapy.Spider):
 		now_page = re.search(r'page=(\d+)', url).group(1)
 		if int(now_page) >= p_num:
 			return
-		n_url = re.sub(r'page=\d+', 'page=' + str(int(now_page + 1)), url)
+		n_url = re.sub(r'page=\d+', 'page=' + str(int(now_page) + 1), url)
 		yield scrapy.Request(n_url, meta={'f_cla': f_cla, 't_cla': t_cla})
