@@ -165,7 +165,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'connection': "keep-alive",
 			'content-length': "87",
 			'content-type': "application/x-www-form-urlencoded",
-			# 'cookie': "JSESSIONID=4EBE67DEB69706501CEDBD19D45CDEF2; UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512374430",
+			'cookie': "JSESSIONID=4EBE67DEB69706501CEDBD19D45CDEF2; UM_distinctid=15fed1a98f94c7-05e1931ccec53d-31657c00-13c680-15fed1a98fc9e5; CNZZDATA1261103251=754832092-1511507618-%7C1512374430",
 			'host': "gk.tj.gov.cn",
 			'origin': "http://gk.tj.gov.cn",
 			'referer': "http://gk.tj.gov.cn/govsearch/search.jsp?ztfl=246",
