@@ -27,7 +27,7 @@ class TouzishijianSpider(scrapy.Spider):
 			'zhengfu_scrapy.middlewares.RetryMiddleware': 110,
 			'zhengfu_scrapy.middlewares.RotateUserAgentMiddleware': 3,
 		},
-		# 'LOG_LEVEL': 'INFO'
+		'LOG_LEVEL': 'INFO'
 	}
 
 	def __init__(self):
