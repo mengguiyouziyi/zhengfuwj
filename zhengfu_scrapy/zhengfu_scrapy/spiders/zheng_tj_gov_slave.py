@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import scrapy, re, math
+import scrapy
 from scrapy.selector import Selector
 from zhengfu_scrapy.items import TJGovItem
 from util.info import startup_nodes
@@ -43,7 +43,6 @@ class TouzishijianSpider(scrapy.Spider):
 			t_cla = v_l[1]
 			detail_url = v_l[2]
 			yield scrapy.Request(detail_url, meta={'f_cla': f_cla, 't_cla': t_cla})
-			print(detail_url)
 
 	def parse(self, response):
 		f_cla = response.meta.get('f_cla')

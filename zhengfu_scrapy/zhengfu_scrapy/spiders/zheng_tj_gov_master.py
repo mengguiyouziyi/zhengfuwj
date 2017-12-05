@@ -118,7 +118,6 @@ class TouzishijianSpider(scrapy.Spider):
 			detail_url = li.xpath('./a/@href').extract_first()
 			val = f_cla + '~' + t_cla + '~' + detail_url
 			self.rc.sadd('zheng_tj_url', val)
-			print(val)
 		arts = re.findall(r'var m_nRecordCount = (\d+?);', response.text)[0]
 		p_num = math.ceil(int(arts) / 10)
 		if int(p_num) < 2:
